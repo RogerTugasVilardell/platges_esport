@@ -657,7 +657,7 @@
         for (const f of [1 / 3, 0.36, 0.38, 0.40]) {
           b1W = TW * f;
           t1H = trenca('Quants hi fan cada activitat?', b1W, 15, 700, FM).length * 22;
-          notaL = trenca(NOTA_B1, b1W, fsN, 400, FM);
+          notaL = trenca(NOTA_B1.replace(/\.$/, ''), b1W, fsN, 400, FM);   // sense punt final a desktop
           hC = TH - t1H - notaL.length * 17 - 14;
           P = layoutPolar(b1W, hC);
           if (P.L >= Math.min(110, P.r0 * 1.5)) break;
