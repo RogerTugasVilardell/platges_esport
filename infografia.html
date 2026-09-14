@@ -472,10 +472,11 @@
 
       info.forEach(ri => {
         const base = yRow + extra / 2 + ri.titH + ri.valH + ri.maxU * p;
-        let xc = x0, europa = null;
+        let xc = x0, titolCont = null;
         ri.charts.forEach((k, i) => {
           const P = PERFILS[k], ws = ri.colW[i], cwTot = ri.chartW[i];
           linies(g, ri.titLines[i], xc, yRow + extra / 2 + 13, miniLH, { fam: FM, size: miniFS, weight: 700 });
+          if (k === 4) titolCont = { x: xc + mesura(ri.titLines[i][0], miniFS, 700, FM) + 6, y: yRow + extra / 2 + 13 - 4.5 };
           g.append('line').attr('x1', xc + 2).attr('x2', xc + cwTot - 2)
             .attr('y1', base + 0.5).attr('y2', base + 0.5).attr('stroke', C.base).attr('stroke-width', 1);
           P.cats.forEach((c, j) => {
@@ -499,19 +500,20 @@
             g.append('text').attr('x', cx).attr('y', topY - 4).attr('text-anchor', 'middle')
               .attr('font-family', FR).attr('font-size', fsR).attr('fill', C.text).text(c[1] + '%');
             linies(g, ri.labLines[i][j], cx, base + fsR + 4, fsR + 2, { size: fsR, fill: C.text2, anchor: 'middle' });
-            if (k === 4 && j === 0)
-              europa = { x: cx + mesura(c[1] + '%', fsR, 400, FR) / 2 + 4, y: topY - 4 - fsR * 0.35, colRight: cx + (n - 1) / 2 * p + d / 2 + 3 };
           });
           xc += cwTot + G;
         });
-        if (ri.hasL && europa) {
+        if (ri.hasL && titolCont) {
+          // Fletxa des del titolet «Continents d'origen» fins a la llista d'estats
           const xl = xc - G + connGap;
-          let ly = europa.y, x1 = europa.x;
-          const listBottom = ly + fsR * 0.35 + (listItems.length - 1) * listLH + 4;
           const rowBottom = base + ri.labH;
-          if (listBottom > rowBottom) { ly -= listBottom - rowBottom; x1 = europa.colRight; }
-          g.append('line').attr('x1', x1).attr('x2', xl - 5).attr('y1', ly).attr('y2', ly)
-            .attr('stroke', C.linia).attr('stroke-width', 1);
+          const llargLlista = fsR * 0.35 + (listItems.length - 1) * listLH + 4;
+          const ly = Math.min(titolCont.y, rowBottom - llargLlista);
+          const dPath = ly === titolCont.y
+            ? `M${titolCont.x},${ly}H${xl - 4}`
+            : `M${titolCont.x},${titolCont.y}H${xl - 12}V${ly}H${xl - 4}`;
+          g.append('path').attr('d', dPath).attr('fill', 'none').attr('stroke', C.linia)
+            .attr('stroke-width', 1).attr('marker-end', 'url(#fletxa)');
           listItems.forEach((l, i) => {
             g.append('text').attr('x', xl).attr('y', ly + fsR * 0.35 + i * listLH)
               .attr('font-family', FR).attr('font-size', fsR).attr('font-weight', l[1]).attr('fill', C.text).text(l[0]);
